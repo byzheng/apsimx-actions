@@ -29,7 +29,7 @@ runs:
       shell: bash
 
     - name: Build APSIMX
-      run: dotnet build ApsimX/Models/Models.csproj -c Release
+      run: dotnet build Models/Models.csproj -c Release
       shell: bash
 
     - name: Add Models to PATH
