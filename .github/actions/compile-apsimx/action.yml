@@ -23,6 +23,11 @@ runs:
       with:
         dotnet-version: '8.0.x'
 
+    
+    - name: Debug files
+      run: ls -al
+      shell: bash
+
     - name: Build APSIMX
       run: dotnet build ApsimX/Models/Models.csproj -c Release
       shell: bash
