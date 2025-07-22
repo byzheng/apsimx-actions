@@ -13,3 +13,5 @@ jobs:
 
       - name: Compile APSIMX
         uses: byzheng/apsimx-actions/.github/actions/compile-apsimx@main
+        with:
+          run-test-example: 'true'

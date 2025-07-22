@@ -1,5 +1,5 @@
 name: 'Compile APSIMX'
-description: 'Checks out and compiles APSIM Next Generation'
+description: 'Checks out and compiles APSIM Next Generation in an isolated temporary directory'
 
 inputs:
   repo-url:
@@ -11,6 +11,11 @@ inputs:
     description: 'Branch to checkout'
     required: false
     default: 'master'
+
+  run-test-example:
+    description: 'Run a test APSIMX model to confirm build'
+    required: false
+    default: 'false'   # Can be set to 'false' by the user
 
 runs:
   using: "composite"
@@ -39,11 +44,13 @@ runs:
       run: echo "$BUILD_DIR/bin/Release/net8.0" >> $GITHUB_PATH
       shell: bash
 
-    - name: Run Wheat example
+    - name: Conditionally run test APSIMX model
+      if: ${{ inputs.run-test-example == 'true' }}
       run: Models "$BUILD_DIR/Examples/Wheat.apsimx"
       shell: bash
 
     - name: Check Wheat.db exists
+      if: ${{ inputs.run-test-example == 'true' }}
       run: |
         if [ -f "$BUILD_DIR/Examples/Wheat.db" ]; then
           echo "✅ Wheat.db exists."
