@@ -4,7 +4,7 @@ inputs:
   repo-url:
     description: 'Git URL of APSIMX source'
     required: false
-    default: 'https://github.com/APSIMInitiative/ApsimX.git'
+    default: 'APSIMInitiative/ApsimX'
   branch:
     description: 'Branch to checkout'
     required: false
