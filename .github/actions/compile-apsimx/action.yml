@@ -30,11 +30,18 @@ runs:
       run: echo "$(pwd)/apsimx/bin/Release/net8.0" >> $GITHUB_PATH
       shell: bash
     
-    - name: Debug files
-      run: ls -al apsimx
-      shell: bash
-
 
     - name: Run Wheat example
       run: Models apsimx/Examples/Wheat.apsimx
       shell: bash
+
+    - name: Check Wheat.db exists
+      run: |
+      if [ -f apsimx/Examples/Wheat.db ]; then
+        echo "Wheat.db exists."
+      else
+        echo "Wheat.db does not exist."
+        exit 1
+      fi
+      shell: bash
+    
