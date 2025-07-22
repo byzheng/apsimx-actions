@@ -37,11 +37,11 @@ runs:
 
     - name: Check Wheat.db exists
       run: |
-      if [ -f apsimx/Examples/Wheat.db ]; then
-        echo "Wheat.db exists."
-      else
-        echo "Wheat.db does not exist."
-        exit 1
-      fi
+        if [ -f apsimx/Examples/Wheat.db ]; then
+          echo "Wheat.db exists."
+        else
+          echo "Wheat.db does not exist."
+          exit 1
+        fi
       shell: bash
     
