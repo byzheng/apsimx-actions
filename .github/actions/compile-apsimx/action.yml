@@ -12,11 +12,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout APSIMX source
-      uses: actions/checkout@v3
-      with:
-        repository: ${{ inputs.repo-url }}
-        ref: ${{ inputs.branch }}
+    - name: Clone APSIMX source
+      run: git clone --branch ${{ inputs.branch }} --depth 1 https://github.com/${{ inputs.repo-url }}.git apsimx
+      shell: bash
 
     - name: Install .NET SDK
       uses: actions/setup-dotnet@v3
@@ -25,13 +23,17 @@ runs:
 
     
     - name: Debug files
-      run: ls -al
+      run: ls -al apsimx
       shell: bash
 
     - name: Build APSIMX
-      run: dotnet build Models/Models.csproj -c Release
+      run: cd apsimx && dotnet build Models/Models.csproj -c Release
       shell: bash
 
     - name: Add Models to PATH
-      run: echo "$(pwd)/Bin/Release/net8.0" >> $GITHUB_PATH
+      run: echo "$(pwd)/apsimx/Bin/Release/net8.0" >> $GITHUB_PATH
+      shell: bash
+
+    - name: Run Wheat example
+      run: Models apsimx/Examples/Wheat.apsimx
       shell: bash
