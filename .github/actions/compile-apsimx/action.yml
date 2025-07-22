@@ -24,8 +24,9 @@ runs:
         dotnet-version: '8.0.x'
 
     - name: Build APSIMX
-      run: |
-        dotnet build ApsimX/Models/Models.csproj -c Release    
+      run: dotnet build ApsimX/Models/Models.csproj -c Release
+      shell: bash
 
     - name: Add Models to PATH
       run: echo "$(pwd)/ApsimX/Bin/Release" >> $GITHUB_PATH
+      shell: bash
