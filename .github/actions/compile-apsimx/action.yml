@@ -1,19 +1,29 @@
 name: 'Compile APSIMX'
 description: 'Checks out and compiles APSIM Next Generation'
+
 inputs:
   repo-url:
-    description: 'Git URL of APSIMX source'
+    description: 'GitHub repo URL of APSIMX source (org/repo format)'
     required: false
     default: 'APSIMInitiative/ApsimX'
+
   branch:
     description: 'Branch to checkout'
     required: false
     default: 'master'
+
 runs:
   using: "composite"
   steps:
+    - name: Set up isolated build directory
+      run: |
+        export BUILD_DIR="$RUNNER_TEMP/apsimx"
+        echo "BUILD_DIR=$BUILD_DIR" >> $GITHUB_ENV
+        mkdir -p "$BUILD_DIR"
+      shell: bash
+
     - name: Clone APSIMX source
-      run: git clone --branch ${{ inputs.branch }} --depth 1 https://github.com/${{ inputs.repo-url }}.git apsimx
+      run: git clone --branch ${{ inputs.branch }} --depth 1 https://github.com/${{ inputs.repo-url }}.git "$BUILD_DIR"
       shell: bash
 
     - name: Install .NET SDK
@@ -21,27 +31,24 @@ runs:
       with:
         dotnet-version: '8.0.x'
 
-    
     - name: Build APSIMX
-      run: cd apsimx && dotnet build Models/Models.csproj -c Release
+      run: dotnet build "$BUILD_DIR/Models/Models.csproj" -c Release
       shell: bash
 
     - name: Add Models to PATH
-      run: echo "$(pwd)/apsimx/bin/Release/net8.0" >> $GITHUB_PATH
+      run: echo "$BUILD_DIR/bin/Release/net8.0" >> $GITHUB_PATH
       shell: bash
-    
 
     - name: Run Wheat example
-      run: Models apsimx/Examples/Wheat.apsimx
+      run: Models "$BUILD_DIR/Examples/Wheat.apsimx"
       shell: bash
 
     - name: Check Wheat.db exists
       run: |
-        if [ -f apsimx/Examples/Wheat.db ]; then
-          echo "Wheat.db exists."
+        if [ -f "$BUILD_DIR/Examples/Wheat.db" ]; then
+          echo "✅ Wheat.db exists."
         else
-          echo "Wheat.db does not exist."
+          echo "❌ Wheat.db does not exist."
           exit 1
         fi
       shell: bash
-    
