@@ -22,17 +22,18 @@ runs:
         dotnet-version: '8.0.x'
 
     
-    - name: Debug files
-      run: ls -al apsimx
-      shell: bash
-
     - name: Build APSIMX
       run: cd apsimx && dotnet build Models/Models.csproj -c Release
       shell: bash
 
     - name: Add Models to PATH
-      run: echo "$(pwd)/apsimx/Bin/Release/net8.0" >> $GITHUB_PATH
+      run: echo "$(pwd)/apsimx/bin/Release/net8.0" >> $GITHUB_PATH
       shell: bash
+    
+    - name: Debug files
+      run: ls -al apsimx
+      shell: bash
+
 
     - name: Run Wheat example
       run: Models apsimx/Examples/Wheat.apsimx
