@@ -33,5 +33,5 @@ runs:
       shell: bash
 
     - name: Add Models to PATH
-      run: echo "$(pwd)/ApsimX/Bin/Release" >> $GITHUB_PATH
+      run: echo "$(pwd)/Bin/Release/net8.0" >> $GITHUB_PATH
       shell: bash
