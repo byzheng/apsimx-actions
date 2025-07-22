@@ -11,5 +11,5 @@ jobs:
       - name: Checkout this repo
         uses: actions/checkout@v3
 
-      - name: Run local APSIMX compile action
+      - name: Compile APSIMX
         uses: byzheng/apsimx-actions/.github/actions/compile-apsimx@main
