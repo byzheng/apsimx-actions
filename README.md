@@ -27,7 +27,7 @@ To use this action in your workflow, reference it with the appropriate path and 
   uses: byzheng/apsimx-action/.github/actions/compile-apsimx@main
 ```
 
-**Example: Enable Test Example Run**
+**Enable Test Example Run**
 
 To explicitly run the Wheat.apsimx test example (e.g. in your own fork or another repo):
 
