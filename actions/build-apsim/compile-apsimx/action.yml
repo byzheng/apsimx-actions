@@ -1,0 +1,31 @@
+name: 'Compile APSIMX'
+description: 'Checks out and compiles APSIM Next Generation'
+inputs:
+  repo-url:
+    description: 'Git URL of APSIMX source'
+    required: false
+    default: 'https://github.com/APSIMInitiative/ApsimX.git'
+  branch:
+    description: 'Branch to checkout'
+    required: false
+    default: 'master'
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout APSIMX source
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ inputs.repo-url }}
+        ref: ${{ inputs.branch }}
+
+    - name: Install .NET SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Build APSIMX
+      run: |
+        dotnet build ApsimX/Models/Models.csproj -c Release    
+
+    - name: Add Models to PATH
+      run: echo "$(pwd)/ApsimX/Bin/Release" >> $GITHUB_PATH
