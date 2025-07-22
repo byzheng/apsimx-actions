@@ -44,7 +44,7 @@ runs:
       run: echo "$BUILD_DIR/bin/Release/net8.0" >> $GITHUB_PATH
       shell: bash
 
-    - name: Conditionally run test APSIMX model
+    - name: Run test APSIMX model
       if: ${{ inputs.run-test-example == 'true' }}
       run: Models "$BUILD_DIR/Examples/Wheat.apsimx"
       shell: bash
