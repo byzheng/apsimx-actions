@@ -1,6 +1,10 @@
 name: 'Compile APSIMX'
 description: 'Clone and build APSIMX in isolated temp dir with .NET and caching'
 
+branding:
+  icon: activity
+  color: green
+  
 inputs:
   repo-url:
     description: 'GitHub repo of APSIMX (org/repo)'
