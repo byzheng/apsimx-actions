@@ -24,7 +24,7 @@ To use this action in your workflow, reference it with the appropriate path and 
 
 ```yaml
 - name: Compile APSIMX
-  uses: byzheng/apsimx-action/.github/actions/compile-apsimx@main
+  uses: byzheng/apsimx-action@main
 ```
 
 **Enable Test Example Run**
@@ -34,7 +34,7 @@ To explicitly run the Wheat.apsimx test example (e.g. in your own fork or anothe
 ```yaml
 
 - name: Compile and test APSIMX
-  uses: byzheng/apsimx-action/.github/actions/compile-apsimx@main
+  uses: byzheng/apsimx-action@main
   with:
     run-test-example: 'true'
 ```

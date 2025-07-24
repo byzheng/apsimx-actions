@@ -12,6 +12,6 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Compile APSIMX
-        uses: byzheng/apsimx-actions/.github/actions/compile-apsimx@main
+        uses: byzheng/apsimx-actions@main
         with:
           run-test-example: 'true'
