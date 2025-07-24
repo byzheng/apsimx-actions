@@ -1,5 +1,5 @@
 name: 'Compile APSIMX'
-description: 'Build APSIM Next Generation in isolated temp directory with caching'
+description: 'Clone and build APSIMX in isolated temp dir with .NET and caching'
 
 inputs:
   repo-url:
@@ -20,13 +20,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set env vars for source and binary dirs
-      run: |
-        echo "SRC_DIR=$RUNNER_TEMP/apsimx-src" >> $GITHUB_ENV
-        echo "BIN_DIR=$RUNNER_TEMP/apsimx-bin" >> $GITHUB_ENV
+    - name: Set isolated APSIMX directory
+      run: echo "APSIM_DIR=$RUNNER_TEMP/apsimx" >> $GITHUB_ENV
       shell: bash
 
-    # 🧠 Cache NuGet packages
+    # ✅ Cache NuGet
     - name: Cache .NET packages
       uses: actions/cache@v4
       with:
@@ -35,52 +33,43 @@ runs:
         restore-keys: |
           nuget-${{ runner.os }}-
 
-    # 📦 Cache APSIMX source
-    - name: Restore APSIMX source from cache
-      id: cache-apsimx-src
+    # ✅ Cache entire APSIMX tree (source + binaries)
+    - name: Restore APSIMX from cache
+      id: cache-apsimx
       uses: actions/cache@v4
       with:
-        path: ${{ env.SRC_DIR }}
-        key: apsimx-src-${{ inputs.repo-url }}-${{ inputs.branch }}
-
-    - name: Clone APSIMX source (if cache miss)
-      if: steps.cache-apsimx-src.outputs.cache-hit != 'true'
-      run: |
-        rm -rf "$SRC_DIR"
-        git clone --branch ${{ inputs.branch }} --depth 1 https://github.com/${{ inputs.repo-url }}.git "$SRC_DIR"
-      shell: bash
-
-    # 🔨 Cache compiled binaries
-    - name: Restore APSIMX binaries from cache
-      id: cache-apsimx-bin
-      uses: actions/cache@v4
-      with:
-        path: ${{ env.BIN_DIR }}
-        key: apsimx-bin-${{ inputs.repo-url }}-${{ inputs.branch }}-${{ hashFiles('${{ env.SRC_DIR }}/Models/**/*.cs') }}
+        path: ${{ env.APSIM_DIR }}
+        key: apsimx-${{ inputs.repo-url }}-${{ inputs.branch }}-${{ hashFiles('**/*.csproj') }}
         restore-keys: |
-          apsimx-bin-${{ inputs.repo-url }}-${{ inputs.branch }}-
+          apsimx-${{ inputs.repo-url }}-${{ inputs.branch }}-
 
-    - name: Build APSIMX (if not cached)
-      if: steps.cache-apsimx-bin.outputs.cache-hit != 'true'
+    - name: Clone APSIMX (if cache miss)
+      if: steps.cache-apsimx.outputs.cache-hit != 'true'
       run: |
-        dotnet build "$SRC_DIR/Models/Models.csproj" -c Release -o "$BIN_DIR"
+        rm -rf "$APSIM_DIR"
+        git clone --branch ${{ inputs.branch }} --depth 1 https://github.com/${{ inputs.repo-url }}.git "$APSIM_DIR"
       shell: bash
 
-    # ✅ Add built Models to PATH
-    - name: Add APSIMX Models to PATH
-      run: echo "$BIN_DIR" >> $GITHUB_PATH
+    # ✅ Build in-place (bin/Release/net8.0)
+    - name: Build APSIMX (if cache miss)
+      if: steps.cache-apsimx.outputs.cache-hit != 'true'
+      run: dotnet build "$APSIM_DIR/Models/Models.csproj" -c Release
       shell: bash
 
-    # 🧪 Optionally run example model
+    - name: Add Models to PATH
+      run: echo "$APSIM_DIR/bin/Release/net8.0" >> $GITHUB_PATH
+      shell: bash
+
+    # 🧪 Run test model
     - name: Run test example model
       if: ${{ inputs.run-test-example == 'true' || github.repository == 'APSIMInitiative/ApsimX' }}
-      run: Models "$SRC_DIR/Examples/Wheat.apsimx"
+      run: Models "$APSIM_DIR/Examples/Wheat.apsimx"
       shell: bash
 
     - name: Check Wheat.db exists
       if: ${{ inputs.run-test-example == 'true' || github.repository == 'APSIMInitiative/ApsimX' }}
       run: |
-        if [ -f "$SRC_DIR/Examples/Wheat.db" ]; then
+        if [ -f "$APSIM_DIR/Examples/Wheat.db" ]; then
           echo "✅ Wheat.db exists."
         else
           echo "❌ Wheat.db does not exist."
