@@ -1,6 +1,6 @@
 # APSIMX GitHub Actions
 
-This GitHub **composite action** checks out the APSIM Next Generation source code, installs the .NET SDK, compiles the `Models.csproj` project, and adds the output directory to the system `PATH`. This enables subsequent workflow steps to run APSIMX simulations using `Models`.
+This GitHub **composite action** checks out the [APSIM Next Generation](https://github.com/APSIMInitiative/ApsimX) source code, installs the .NET SDK, compiles the `Models.csproj` project, and adds the output directory to the system `PATH`. This enables subsequent workflow steps to run APSIMX simulations using `Models`.
 
 ## 📦 Features
 
@@ -42,6 +42,14 @@ To explicitly run the Wheat.apsimx test example (e.g. in your own fork or anothe
 ## 📁 Output
 
 The compiled APSIMX binary (`Models`) is available in the system `PATH`.
+
+
+## 🙏 Acknowledgments
+
+This action builds and runs [APSIM Next Generation](https://github.com/APSIMInitiative/ApsimX), developed by the [APSIM Initiative](https://www.apsim.info).  
+Please refer to the [APSIM License](https://github.com/APSIMInitiative/ApsimX/blob/master/LICENSE.md) for usage terms.
+
+Acknowledgment is made to the APSIM Initiative which takes responsibility for quality assurance and a structured innovation programme for APSIM’s modelling software, which is provided free for research and development use (see www.apsim.info for details).
 
 
 
