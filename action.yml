@@ -25,7 +25,7 @@ runs:
   using: "composite"
   steps:
     - name: Set isolated APSIMX directory
-      run: echo "APSIM_DIR=$RUNNER_TEMP/apsimx" >> $GITHUB_ENV
+      run: echo "APSIMX_DIR=$RUNNER_TEMP/apsimx" >> $GITHUB_ENV
       shell: bash
 
     # ✅ Cache NuGet
@@ -42,7 +42,7 @@ runs:
       id: cache-apsimx
       uses: actions/cache@v4
       with:
-        path: ${{ env.APSIM_DIR }}
+        path: ${{ env.APSIMX_DIR }}
         key: apsimx-${{ inputs.repo-url }}-${{ inputs.branch }}-${{ hashFiles('**/*.csproj') }}
         restore-keys: |
           apsimx-${{ inputs.repo-url }}-${{ inputs.branch }}-
@@ -50,30 +50,30 @@ runs:
     - name: Clone APSIMX (if cache miss)
       if: steps.cache-apsimx.outputs.cache-hit != 'true'
       run: |
-        rm -rf "$APSIM_DIR"
-        git clone --branch ${{ inputs.branch }} --depth 1 https://github.com/${{ inputs.repo-url }}.git "$APSIM_DIR"
+        rm -rf "$APSIMX_DIR"
+        git clone --branch ${{ inputs.branch }} --depth 1 https://github.com/${{ inputs.repo-url }}.git "$APSIMX_DIR"
       shell: bash
 
     # ✅ Build in-place (bin/Release/net8.0)
     - name: Build APSIMX (if cache miss)
       if: steps.cache-apsimx.outputs.cache-hit != 'true'
-      run: dotnet build "$APSIM_DIR/Models/Models.csproj" -c Release
+      run: dotnet build "$APSIMX_DIR/Models/Models.csproj" -c Release
       shell: bash
 
     - name: Add Models to PATH
-      run: echo "$APSIM_DIR/bin/Release/net8.0" >> $GITHUB_PATH
+      run: echo "$APSIMX_DIR/bin/Release/net8.0" >> $GITHUB_PATH
       shell: bash
 
     # 🧪 Run test model
     - name: Run test example model
       if: ${{ inputs.run-test-example == 'true' || github.repository == 'APSIMInitiative/ApsimX' }}
-      run: Models "$APSIM_DIR/Examples/Wheat.apsimx"
+      run: Models "$APSIMX_DIR/Examples/Wheat.apsimx"
       shell: bash
 
     - name: Check Wheat.db exists
       if: ${{ inputs.run-test-example == 'true' || github.repository == 'APSIMInitiative/ApsimX' }}
       run: |
-        if [ -f "$APSIM_DIR/Examples/Wheat.db" ]; then
+        if [ -f "$APSIMX_DIR/Examples/Wheat.db" ]; then
           echo "✅ Wheat.db exists."
         else
           echo "❌ Wheat.db does not exist."
