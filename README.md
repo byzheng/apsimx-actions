@@ -41,7 +41,8 @@ To explicitly run the Wheat.apsimx test example (e.g. in your own fork or anothe
 
 ## 📁 Output
 
-The compiled APSIMX binary (`Models`) is available in the system `PATH`.
+The compiled APSIMX binary (`Models`) is available in the system `PATH`. A new environment variable `APSIMX_DIR` is created.
+
 
 
 ## 🙏 Acknowledgments
