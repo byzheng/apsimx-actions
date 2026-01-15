@@ -41,7 +41,6 @@ runs:
       run: |
         cd "$APSIMX_DIR"
         git reset --hard
-    #    git clean -fd
         git pull
       shell: bash
 
