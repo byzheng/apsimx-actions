@@ -52,6 +52,7 @@ runs:
       run: |
         git clone --branch ${{ inputs.branch }} https://github.com/${{ inputs.repo-url }}.git ${{ env.APSIMX_DIR }}
         cd ${{ env.APSIMX_DIR }}
+      shell: bash
     # ✅ Update APSIMX (if cached)
     - name: Update APSIMX
       if: steps.cache-apsimx.outputs.cache-hit == 'true'
@@ -59,6 +60,7 @@ runs:
         cd ${{ env.APSIMX_DIR }}
         git reset --hard
         git pull
+      shell: bash
 
     # ✅ Build in-place (bin/Release/net8.0)
     - name: Build APSIMX
