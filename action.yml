@@ -32,7 +32,8 @@ runs:
     - name: Clone APSIMX
       if: steps.cache-apsimx.outputs.cache-hit != 'true'
       run: |
-        git clone --branch ${{ inputs.branch }} https://github.com/${{ inputs.repo-url }}.git "$APSIMX_DIR"
+        git clone --branch ${{ inputs.branch }} https://github.com/${{ inputs.repo-url }}.git "$GITHUB_WORKSPACE"
+        cd "$APSIMX_DIR"
       shell: bash
 
     # 🔄 Pull updates if cache hit
