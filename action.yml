@@ -57,18 +57,11 @@ runs:
     - name: Clone APSIMX (if missing)
       if: steps.cache-apsimx.outputs.cache-hit != 'true'
       run: |
+        rm -rf "$APSIMX_DIR"
         git clone --branch ${{ inputs.branch }} https://github.com/${{ inputs.repo-url }}.git ${{ env.APSIMX_DIR }}
         cd ${{ env.APSIMX_DIR }}
       shell: bash
-    # ✅ Update APSIMX (if cached)
-    - name: Update APSIMX
-      if: steps.cache-apsimx.outputs.cache-hit == 'true'
-      run: |
-        cd ${{ env.APSIMX_DIR }}
-        git reset --hard
-        git pull
-      shell: bash
-
+    
     # ✅ Build in-place (bin/Release/net8.0)
     - name: Build APSIMX
       run: dotnet build "$APSIMX_DIR/Models/Models.csproj" -c Release
