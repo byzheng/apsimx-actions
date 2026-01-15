@@ -36,11 +36,14 @@ runs:
         key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
         restore-keys: |
           nuget-${{ runner.os }}
+    # ✅ Get latest commit SHA for caching
     - name: Get latest commit SHA
       id: get-sha
       run: |
         SHA=$(git ls-remote https://github.com/${{ inputs.repo-url }}.git ${{ inputs.branch }} | cut -f1)
         echo "sha=$SHA" >> $GITHUB_OUTPUT
+      shell: bash
+    
     # ✅ Cache entire APSIMX tree (source + binaries)
     - name: Restore APSIMX from cache
       id: cache-apsimx
@@ -50,7 +53,7 @@ runs:
         key: apsimx-${{ inputs.repo-url }}-${{ inputs.branch }}-${{ steps.get-sha.outputs.sha }}
         restore-keys: |
           apsimx-${{ inputs.repo-url }}-${{ inputs.branch }}-
-    # 
+    # ✅ Clone APSIMX (if missing)
     - name: Clone APSIMX (if missing)
       if: steps.cache-apsimx.outputs.cache-hit != 'true'
       run: |
