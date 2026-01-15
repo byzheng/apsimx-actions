@@ -1,12 +1,31 @@
 name: 'Compile APSIMX'
-description: 'Clone, cache, and build APSIMX with persistent working tree'
+description: 'Clone and build APSIMX in isolated temp dir with .NET and caching'
+
+branding:
+  icon: activity
+  color: green
+  
+inputs:
+  repo-url:
+    description: 'GitHub repo of APSIMX (org/repo)'
+    required: false
+    default: 'APSIMInitiative/ApsimX'
+
+  branch:
+    description: 'Branch to checkout'
+    required: false
+    default: 'master'
+
+  run-test-example:
+    description: 'Run Wheat.apsimx to verify build'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
   steps:
-    # 📍 Use workspace, not RUNNER_TEMP
-    - name: Set APSIMX directory
-      run: echo "APSIMX_DIR=$GITHUB_WORKSPACE/apsimx" >> $GITHUB_ENV
+    - name: Set isolated APSIMX directory
+      run: echo "APSIMX_DIR=$RUNNER_TEMP/apsimx" >> $GITHUB_ENV
       shell: bash
 
     # ✅ Cache NuGet
@@ -16,10 +35,10 @@ runs:
         path: ~/.nuget/packages
         key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
         restore-keys: |
-          nuget-${{ runner.os }}-
+          nuget-${{ runner.os }}
 
-    # ✅ Cache APSIMX repo + build outputs
-    - name: Restore APSIMX cache
+    # ✅ Cache entire APSIMX tree (source + binaries)
+    - name: Restore APSIMX from cache
       id: cache-apsimx
       uses: actions/cache@v4
       with:
@@ -27,30 +46,42 @@ runs:
         key: apsimx-${{ inputs.repo-url }}-${{ inputs.branch }}-
         restore-keys: |
           apsimx-${{ inputs.repo-url }}-${{ inputs.branch }}-
-
-    # 📥 Clone if cache miss
-    - name: Clone APSIMX
+    # 
+    - name: Clone APSIMX (if missing)
       if: steps.cache-apsimx.outputs.cache-hit != 'true'
       run: |
-        git clone --branch ${{ inputs.branch }} https://github.com/${{ inputs.repo-url }}.git "$GITHUB_WORKSPACE"
-        cd "$APSIMX_DIR"
-      shell: bash
-
-    # 🔄 Pull updates if cache hit
+        git clone --branch ${{ inputs.branch }} https://github.com/${{ inputs.repo-url }}.git ${{ env.APSIMX_DIR }}
+        cd ${{ env.APSIMX_DIR }}
+    # ✅ Update APSIMX (if cached)
     - name: Update APSIMX
       if: steps.cache-apsimx.outputs.cache-hit == 'true'
       run: |
-        cd "$APSIMX_DIR"
+        cd ${{ env.APSIMX_DIR }}
         git reset --hard
         git pull
-      shell: bash
 
-    # 🏗 Build APSIMX
+    # ✅ Build in-place (bin/Release/net8.0)
     - name: Build APSIMX
       run: dotnet build "$APSIMX_DIR/Models/Models.csproj" -c Release
       shell: bash
 
-    # ➕ Add Models to PATH
     - name: Add Models to PATH
       run: echo "$APSIMX_DIR/bin/Release/net8.0" >> $GITHUB_PATH
+      shell: bash
+
+    # 🧪 Run test model
+    - name: Run test example model
+      if: ${{ inputs.run-test-example == 'true' || github.repository == 'APSIMInitiative/ApsimX' }}
+      run: Models "$APSIMX_DIR/Examples/Wheat.apsimx"
+      shell: bash
+
+    - name: Check Wheat.db exists
+      if: ${{ inputs.run-test-example == 'true' || github.repository == 'APSIMInitiative/ApsimX' }}
+      run: |
+        if [ -f "$APSIMX_DIR/Examples/Wheat.db" ]; then
+          echo "✅ Wheat.db exists."
+        else
+          echo "❌ Wheat.db does not exist."
+          exit 1
+        fi
       shell: bash
